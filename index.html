@@ -84,8 +84,8 @@
                                 <tr v-for="(item, index) in users">
                                     <th scope="row">{{ index+1 }}</th>
                                     <td @click="goToUserDetail(item)"><a href="#">{{ item.username }}</a></td>
-                                    <td>{{ Object.keys(item.choujiang).length }}</td>
-                                    <td><a href="#" @click="goToUserAwards(item)">{{ getUserAwards(item.choujiang).length }}</a></td>
+                                    <td>{{ item.choujiang == undefined ? 0 : Object.keys(item.choujiang).length }}</td>
+                                    <td><a href="#" @click="goToUserAwards(item)">{{ item.choujiang == undefined ? 0 : getUserAwards(item.choujiang).length }}</a></td>
                                 </tr>
                             </tbody>
                         </table>
