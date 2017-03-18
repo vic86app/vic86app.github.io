@@ -1,393 +1,427 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vic86 后台管理</title>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-</head>
-
-<body>
-    <div id="app">
-	    <nav class="navbar navbar-default">
-		<div class="container-fluid">
-		<!-- Brand and toggle get grouped for better mobile display -->
-		<div class="navbar-header">
-		  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-		    <span class="sr-only">Toggle navigation</span>
-		    <span class="icon-bar"></span>
-		    <span class="icon-bar"></span>
-		    <span class="icon-bar"></span>
-		  </button>
-		  <a class="navbar-brand" href="#">Vic86</a>
-		</div>
-
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-		  <ul class="nav navbar-nav">
-		    <li v-bind:class="{ active: (currentPage === 'Home') }"><a href="#" @click="goToUserList">用户列表</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'ProcessAward') }" @click="goToProcessAward"><a href="#">处理中奖</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'AwardSetting') }" @click="goToPage('AwardSetting')"><a href="#">抽奖设置</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'BannerSetting') }" @click="goToPage('BannerSetting')"><a href="#">首页滚动设置</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'WebsiteSetting') }" @click="goToPage('WebsiteSetting')"><a href="#">网址设置</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'NewsSetting') }" @click="goToPage('NewsSetting')"><a href="#">最新消息设置</a></li>
-		    <li v-bind:class="{ active: (currentPage === 'EventSetting') }" @click="goToPage('EventSetting')"><a href="#">活动消息设置</a></li>
-		  </ul>
-		</div><!-- /.navbar-collapse -->
-		</div><!-- /.container-fluid -->
-		</nav>
-        <template v-if="user === null">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h1 class="text-center">登录 —— Vic86 后台管理</h1>
-                        <form>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">管理员邮箱</label>
-                                <input type="email" class="form-control" v-model="newUser.email" placeholder="请输入邮箱。">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputPassword1">密码</label>
-                                <input type="password" class="form-control" v-model="newUser.password" placeholder="Password">
-                            </div>
-                            <a class="btn btn-default" @click="login">登录</a>
-                        </form>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'Home')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">用户列表 —— Vic86 后台管理登录</h3>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>用户名</th>
-                                    <th>抽奖次数</th>
-                                    <th>中奖次数</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in users">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td @click="goToUserDetail(item)"><a href="#">{{ item.username }}</a></td>
-                                    <td>{{ item.choujiang == undefined ? 0 : Object.keys(item.choujiang).length }}</td>
-                                    <td><a href="#" @click="goToUserAwards(item)">{{ item.choujiang == undefined ? 0 : getUserAwards(item.choujiang).length }}</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'UserDetail')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">用户详情 —— Vic86 后台管理登录</h3>
-		                <a class="btn btn-default" @click="goToUserList">返回用户列表</a>
-                        <h5>用户名：{{ detail.username }}</h5>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>登录时间</th>
-                                    <th>登录 IP</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, key, index) in detail.checkIn">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item.ip }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'UserAwards')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">中奖信息 —— Vic86 后台管理登录</h3>
-		                <a class="btn btn-default" @click="goToUserList">返回用户列表</a>
-                        <h5>用户名：{{ detail.username }}</h5>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>抽奖时间</th>
-                                    <th>奖品</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, key, index) in detail.choujiang">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item.prize }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'ProcessAward')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">处理中奖 —— Vic86 后台管理登录</h3>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>用户名</th>
-                                    <th>抽奖时间</th>
-                                    <th>奖品</th>
-                                    <th>处理</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in visibleAwards">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td>{{ item.username }}</td>
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item.prize }}</td>
-                                    <td v-if="item.processed">
-										已处理
-										<a class="btn btn-danger btn-xs" @click="deleteAward(item['.key'])">删除</a>
-                                    </td>
-                                    <td v-if="!item.processed">
-										<a class="btn btn-success btn-xs" @click="processAward(item['.key'])">标记处理完毕</a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'AwardSetting')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">抽奖设置 —— Vic86 后台管理登录</h3>
-                        <h5>
-                        	抽奖时间间隔：
-                        	<input type="number" style="width: 120px;" name="cjGap" :value="rootR[0] ? rootR[0]['.value'] : '-'" @change="updateGap()">
-                        	小时
-                        </h5>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>奖品</th>
-                                    <th>中奖几率</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in cjSetting">
-                                    <th scope="row">{{ index+1 }} 等奖</th>
-                                    <td>{{ item.award }}</td>
-                                    <td><input type="number" :name="'cjChance'+index" :value="item.chance" @change="updateCjChance(index)"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'BannerSetting')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">首页滚动设置 —— Vic86 后台管理登录</h3>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>url</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in banners">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td><input type="text" style="width: 100%;" :name="'banner'+index" :value="item.url" @change="updateBanner(index)"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'WebsiteSetting')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">网址设置 —— Vic86 后台管理登录</h3>
-                        <h5>普通用户网址</h5>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>url</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in normal">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td><input type="text" style="width: 100%;" :name="'normal'+index" :value="item['.value']" @change="updateNormal(index)"></td>
-                                    <td><a class="btn btn-danger btn-xs" v-if="index == (normal.length-1)" @click="deleteNormal(index)">删除</a></td>
-                                </tr>
-                                <tr>
-                                	<th>新增</th>
-                                	<td><input type="text" style="width: 100%;" name="normalNew"></td>
-                                    <td><a class="btn btn-success btn-xs" @click="newNormal">添加</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <h5>VIP 网址</h5>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>url</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in vip">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td><input type="text" style="width: 100%;" :name="'vip'+index" :value="item['.value']" @change="updateVip(index)"></td>
-                                    <td><a class="btn btn-danger btn-xs" v-if="index == (vip.length-1)" @click="deleteVip(index)">删除</a></td>
-                                </tr>
-                                <tr>
-                                	<th>新增</th>
-                                	<td><input type="text" style="width: 100%;" name="cipNew"></td>
-                                    <td><a class="btn btn-success btn-xs" @click="newVip">添加</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'NewsSetting')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">最新消息设置 —— Vic86 后台管理登录</h3>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>图片链接</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in news">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td><input type="text" style="width: 100%;" :name="'news'+index" :value="item.url" @change="updateNews(index)"></td>
-                                    <td><a class="btn btn-danger btn-xs" v-if="index == (news.length-1)" @click="deleteNews(index)">删除</a></td>
-                                </tr>
-                                <tr>
-                                	<th>新增</th>
-                                	<td><input type="text" style="width: 100%;" name="newsNew"></td>
-                                    <td><a class="btn btn-success btn-xs" @click="newNews">添加</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-        <template v-if="(user !== null && currentPage === 'EventSetting')">
-            <div class="container">
-                <div style="height: 50px;width: 100%;"></div>
-                <div class="row">
-                    <div class="col-md-3"></div>
-                    <div class="col-md-6">
-                        <h3 class="text-center">活动信息设置 —— Vic86 后台管理登录</h3>
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>图片链接</th>
-                                    <th>标题</th>
-                                    <th>内容</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in events">
-                                    <th scope="row">{{ index+1 }}</th>
-                                    <td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.url" @change="updateEvent(index)"></td>
-                                    <td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.title" @change="updateEvent(index)"></td>
-                                    <td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.content" @change="updateEvent(index)"></td>
-                                    <td><a class="btn btn-danger btn-xs" v-if="index == (events.length-1)" @click="deleteEvent(index)">删除</a></td>
-                                </tr>
-                                <tr>
-                                	<th>新增</th>
-                                	<td><input type="text" style="width: 100%;" name="eventURL"></td>
-                                    <td><input type="text" style="width: 100%;" name="eventTitle"></td>
-                                    <td><input type="text" style="width: 100%;" name="eventContent"></td>
-                                    <td><a class="btn btn-success btn-xs" @click="newEvent">添加</a></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col-md-3"></div>
-                </div>
-            </div>
-        </template>
-    </div>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
-    <script src="https://unpkg.com/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/vuefire"></script>
-    <script src="./js/main.js"></script>
-</body>
-
-</html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Vic86 后台管理</title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	</head>
+	<body>
+		<div id="app">
+			<nav class="navbar navbar-default">
+				<div class="container-fluid">
+					<!-- Brand and toggle get grouped for better mobile display -->
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">Vic86</a>
+					</div>
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav">
+							<li v-bind:class="{ active: (currentPage === 'Home') }"><a href="#" @click="goToUserList">用户列表</a></li>
+							<li v-bind:class="{ active: (currentPage === 'ProcessAward') }" @click="goToProcessAward"><a href="#">处理中奖</a></li>
+							<li v-bind:class="{ active: (currentPage === 'AwardSetting') }" @click="goToPage('AwardSetting')"><a href="#">抽奖设置</a></li>
+							<li v-bind:class="{ active: (currentPage === 'BannerSetting') }" @click="goToPage('BannerSetting')"><a href="#">首页滚动设置</a></li>
+							<li v-bind:class="{ active: (currentPage === 'WebsiteSetting') }" @click="goToPage('WebsiteSetting')"><a href="#">网址设置</a></li>
+							<li v-bind:class="{ active: (currentPage === 'NewsSetting') }" @click="goToPage('NewsSetting')"><a href="#">最新消息设置</a></li>
+							<li v-bind:class="{ active: (currentPage === 'EventSetting') }" @click="goToPage('EventSetting')"><a href="#">活动消息设置</a></li>
+							<li v-bind:class="{ active: (currentPage === 'KefuSetting') }" @click="goToPage('KefuSetting')"><a href="#">客服设置</a></li>
+						</ul>
+						</div><!-- /.navbar-collapse -->
+						</div><!-- /.container-fluid -->
+					</nav>
+					<template v-if="user === null">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h1 class="text-center">登录 —— Vic86 后台管理</h1>
+								<form>
+									<div class="form-group">
+										<label for="exampleInputEmail1">管理员邮箱</label>
+										<input type="email" class="form-control" v-model="newUser.email" placeholder="请输入邮箱。">
+									</div>
+									<div class="form-group">
+										<label for="exampleInputPassword1">密码</label>
+										<input type="password" class="form-control" v-model="newUser.password" placeholder="Password">
+									</div>
+									<a class="btn btn-default" @click="login">登录</a>
+								</form>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'Home')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">用户列表 —— Vic86 后台管理登录</h3>
+								<div class="input-group">
+									<input type="text" class="form-control" name="user-search" v-model="userSearch" placeholder="搜索用户...">
+									<span class="input-group-btn">
+										<button class="btn btn-default" type="button">搜索</button>
+									</span>
+								</div>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>用户名</th>
+											<th>抽奖次数</th>
+											<th>中奖次数</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in getUsers">
+											<th scope="row">{{ index+1 }}</th>
+											<td @click="goToUserDetail(item)"><a href="#">{{ item.username }}</a></td>
+											<td>{{ item.choujiang == undefined ? 0 : Object.keys(item.choujiang).length }}</td>
+											<td><a href="#" @click="goToUserAwards(item)">{{ item.choujiang == undefined ? 0 : getUserAwards(item.choujiang).length }}</a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'UserDetail')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">用户详情 —— Vic86 后台管理登录</h3>
+								<a class="btn btn-default" @click="goToUserList">返回用户列表</a>
+								<h5>用户名：{{ detail.username }}</h5>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>登录时间</th>
+											<th>登录 IP</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, key, index) in detail.checkIn">
+											<th scope="row">{{ index+1 }}</th>
+											<td>{{ item.date }}</td>
+											<td>{{ item.ip }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'UserAwards')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">中奖信息 —— Vic86 后台管理登录</h3>
+								<a class="btn btn-default" @click="goToUserList">返回用户列表</a>
+								<h5>用户名：{{ detail.username }}</h5>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>抽奖时间</th>
+											<th>奖品</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, key, index) in detail.choujiang">
+											<th scope="row">{{ index+1 }}</th>
+											<td>{{ item.date }}</td>
+											<td>{{ item.prize }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'ProcessAward')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">处理中奖 —— Vic86 后台管理登录</h3>
+								<div class="input-group">
+									<input type="text" class="form-control" name="award-search" v-model="awardSearch" placeholder="搜索用户...">
+									<span class="input-group-btn">
+										<button class="btn btn-default" type="button">搜索</button>
+									</span>
+								</div>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>用户名</th>
+											<th>抽奖时间</th>
+											<th>奖品</th>
+											<th>处理</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in visibleAwards">
+											<th scope="row">{{ index+1 }}</th>
+											<td>{{ item.username }}</td>
+											<td>{{ item.date }}</td>
+											<td>{{ item.prize }}</td>
+											<td v-if="item.processed">
+												已处理
+												<a class="btn btn-danger btn-xs" @click="deleteAward(item['.key'])">删除</a>
+											</td>
+											<td v-if="!item.processed">
+												<a class="btn btn-success btn-xs" @click="processAward(item['.key'])">标记处理完毕</a>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'AwardSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">抽奖设置 —— Vic86 后台管理登录</h3>
+								<h5>
+								抽奖时间间隔：
+								<input type="number" style="width: 120px;" name="cjGap" :value="rootR[0] ? rootR[0]['.value'] : '-'" @change="updateGap()">
+								小时
+								</h5>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>奖品</th>
+											<th>中奖几率</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in cjSetting">
+											<th scope="row">{{ index+1 }} 等奖</th>
+											<td><input type="text" :name="'cjAward'+index" :value="item.award" @change="updateCjAward(index)"></td>
+											<td><input type="number" :name="'cjChance'+index" :value="item.chance" @change="updateCjChance(index)"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'BannerSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">首页滚动设置 —— Vic86 后台管理登录</h3>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>url</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in banners">
+											<th scope="row">{{ index+1 }}</th>
+											<td><input type="text" style="width: 100%;" :name="'banner'+index" :value="item.url" @change="updateBanner(index)"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'WebsiteSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">网址设置 —— Vic86 后台管理登录</h3>
+								<h5>普通用户网址</h5>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>url</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in normal">
+											<th scope="row">{{ index+1 }}</th>
+											<td><input type="text" style="width: 100%;" :name="'normal'+index" :value="item['.value']" @change="updateNormal(index)"></td>
+											<td><a class="btn btn-danger btn-xs" v-if="index == (normal.length-1)" @click="deleteNormal(index)">删除</a></td>
+										</tr>
+										<tr>
+											<th>新增</th>
+											<td><input type="text" style="width: 100%;" name="normalNew"></td>
+											<td><a class="btn btn-success btn-xs" @click="newNormal">添加</a></td>
+										</tr>
+									</tbody>
+								</table>
+								<h5>VIP 网址</h5>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>url</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in vip">
+											<th scope="row">{{ index+1 }}</th>
+											<td><input type="text" style="width: 100%;" :name="'vip'+index" :value="item['.value']" @change="updateVip(index)"></td>
+											<td><a class="btn btn-danger btn-xs" v-if="index == (vip.length-1)" @click="deleteVip(index)">删除</a></td>
+										</tr>
+										<tr>
+											<th>新增</th>
+											<td><input type="text" style="width: 100%;" name="cipNew"></td>
+											<td><a class="btn btn-success btn-xs" @click="newVip">添加</a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'NewsSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">最新消息设置 —— Vic86 后台管理登录</h3>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>消息内容</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in news">
+											<th scope="row">{{ index+1 }}</th>
+											<td><input type="text" style="width: 100%;" :name="'news'+index" :value="item.content" @change="updateNews(index)"></td>
+											<td><a class="btn btn-danger btn-xs" v-if="index == (news.length-1)" @click="deleteNews(index)">删除</a></td>
+										</tr>
+										<tr>
+											<th>新增</th>
+											<td><input type="text" style="width: 100%;" name="newsNew"></td>
+											<td><a class="btn btn-success btn-xs" @click="newNews">添加</a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'EventSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">活动信息设置 —— Vic86 后台管理登录</h3>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>图片链接</th>
+											<th>标题</th>
+											<th>内容</th>
+											<th>操作</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(item, index) in events">
+											<th scope="row">{{ index+1 }}</th>
+											<td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.url" @change="updateEvent(index)"></td>
+											<td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.title" @change="updateEvent(index)"></td>
+											<td><input type="text" style="width: 100%;" :name="'event'+index" :value="item.content" @change="updateEvent(index)"></td>
+											<td><a class="btn btn-danger btn-xs" v-if="index == (events.length-1)" @click="deleteEvent(index)">删除</a></td>
+										</tr>
+										<tr>
+											<th>新增</th>
+											<td><input type="text" style="width: 100%;" name="eventURL"></td>
+											<td><input type="text" style="width: 100%;" name="eventTitle"></td>
+											<td><input type="text" style="width: 100%;" name="eventContent"></td>
+											<td><a class="btn btn-success btn-xs" @click="newEvent">添加</a></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+					<template v-if="(user !== null && currentPage === 'KefuSetting')">
+					<div class="container">
+						<div style="height: 50px;width: 100%;"></div>
+						<div class="row">
+							<div class="col-md-3"></div>
+							<div class="col-md-6">
+								<h3 class="text-center">客服设置 —— Vic86 后台管理登录</h3>
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>客服网址</th>
+											<th><input type="text" style="width: 100%;" name="kefu" :value="rootR[5] ? rootR[5]['.value'] : '加载中……'" @change="updateKefu()"></th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+							<div class="col-md-3"></div>
+						</div>
+					</div>
+					</template>
+				</div>
+				<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+				<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+				<!-- Latest compiled and minified JavaScript -->
+				<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+				<script src="https://www.gstatic.com/firebasejs/3.7.2/firebase.js"></script>
+				<script src="https://unpkg.com/vue/dist/vue.js"></script>
+				<script src="https://unpkg.com/vuefire"></script>
+				<script src="./js/main.js"></script>
+			</body>
+		</html>
