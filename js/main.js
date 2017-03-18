@@ -19,6 +19,7 @@ var normalRef = firebase.database().ref('websites/normal');
 var vipRef = firebase.database().ref('websites/vip');
 var newsRef = firebase.database().ref('notice/news');
 var eventRef = firebase.database().ref('notice/events');
+var kefuRef = firebase.database().ref('kefu');
 
 
 // create Vue app
@@ -36,6 +37,8 @@ var app = new Vue({
     },
     item: null,
     detail: null,
+    userSearch: '',
+    awardSearch: ''
   },
   // firebase binding
   // https://github.com/vuejs/vuefire
@@ -49,7 +52,8 @@ var app = new Vue({
     normal: normalRef,
     vip: vipRef,
     news: newsRef,
-    events: eventRef
+    events: eventRef,
+    kefu: kefuRef
   },
   // computed property for form validation state
   computed: {
@@ -66,15 +70,34 @@ var app = new Vue({
       })
     },
     visibleAwards: function() {
+      if (this.awardSearch === '') {
+        return this.awards;
+      }
       let list = [];
       for (let i = 0; i < this.awards.length; i++) {
         let item = this.awards[i];
-        if (!item.hidden) {
+        if (item.username.indexOf(this.awardSearch) !== -1) {
           list.push(item);
         }
       }
       return list;
-    }
+    },
+    isLogin: function() {
+      return this.user !== null;
+    },
+    getUsers: function() {
+      if (this.userSearch === '') {
+        return this.users;
+      }
+      let list = [];
+      for (let i = 0; i < this.users.length; i++) {
+        let item = this.users[i];
+        if (item.username.indexOf(this.userSearch) !== -1) {
+          list.push(item);
+        }
+      }
+      return list;
+    },
   },
   mounted: function() {
     firebase.auth().onAuthStateChanged(this.onUserLogin);
@@ -95,16 +118,6 @@ var app = new Vue({
         console.log(errorMessage);
         // ...
       });
-    },
-    addUser: function() {
-      if (this.isValid) {
-        usersRef.push(this.newUser)
-        this.newUser.name = ''
-        this.newUser.email = ''
-      }
-    },
-    removeUser: function(user) {
-      usersRef.child(user['.key']).remove()
     },
     getUserAwards: function(cj) {
       let keys = Object.keys(cj);
@@ -148,13 +161,22 @@ var app = new Vue({
     },
     updateCjChance: function(index) {
       let ele = document.getElementsByName('cjChance'+index)[0];
-      console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        cjSettingRef.child(index).child('chance').set(newValue);
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          cjSettingRef.child(index).child('chance').set(newValue);
+        }
       }
+    },
+    updateCjAward: function(index) {
+      let ele = document.getElementsByName('cjAward'+index)[0];
+      if (ele) {
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          cjSettingRef.child(index).child('award').set(newValue);
+        }
       }
     },
     updateGap: function() {
@@ -236,7 +258,7 @@ var app = new Vue({
         let newValue = ele.value
         console.log(newValue);
         if (newValue) {
-          newsRef.child(this.news.length).child('url').set(newValue);
+          newsRef.child(this.news.length).child('content').set(newValue);
         }
       }
     },
@@ -247,7 +269,7 @@ var app = new Vue({
       let newValue = ele.value
       console.log(newValue);
       if (newValue) {
-        newsRef.child(index).child('url').set(newValue);
+        newsRef.child(index).child('content').set(newValue);
       }
       }
     },
@@ -276,6 +298,15 @@ var app = new Vue({
     },
     deleteEvent: function(index) {
       eventRef.child(index).remove();
-    }
+    },
+    updateKefu: function() {
+      let ele = document.getElementsByName('kefu')[0];
+      if (ele) {
+        let newValue = ele.value;
+        if (newValue) {
+          firebase.database().ref().child('kefu').set(newValue);
+        }
+      }
+    },
   }
 })
