@@ -190,6 +190,17 @@ var app = new Vue({
       }
       }
     },
+    updateCjBanner: function() {
+      let ele = document.getElementsByName('cjBanner')[0];
+      console.log(ele);
+      if (ele) {
+      let newValue = ele.value
+      console.log(newValue);
+      if (newValue) {
+        firebase.database().ref().child('choujiangBanner').set(newValue);
+      }
+      }
+    },
     updateBanner: function(index) {
       let ele = document.getElementsByName('banner'+index)[0];
       console.log(ele);
