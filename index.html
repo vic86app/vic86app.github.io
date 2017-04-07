@@ -215,6 +215,11 @@
 							<div class="col-md-6">
 								<h3 class="text-center">抽奖设置 —— Vic86 后台管理登录</h3>
 								<h5>
+								抽奖页面图片：
+								<input type="text" style="width: 100%;" name="cjBanner" :value="rootR[3] ? rootR[3]['.value'] : '-'" @change="updateCjBanner()">
+								小时
+								</h5>
+								<h5>
 								抽奖时间间隔：
 								<input type="number" style="width: 120px;" name="cjGap" :value="rootR[0] ? rootR[0]['.value'] : '-'" @change="updateGap()">
 								小时
