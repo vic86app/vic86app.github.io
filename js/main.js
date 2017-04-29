@@ -157,10 +157,10 @@ var app = new Vue({
       this.currentPage = name;
     },
     resetCjGap: function() {
-      
+
     },
     updateCjChance: function(index) {
-      let ele = document.getElementsByName('cjChance'+index)[0];
+      let ele = document.getElementsByName('cjChance' + index)[0];
       if (ele) {
         let newValue = ele.value
         console.log(newValue);
@@ -170,7 +170,7 @@ var app = new Vue({
       }
     },
     updateCjAward: function(index) {
-      let ele = document.getElementsByName('cjAward'+index)[0];
+      let ele = document.getElementsByName('cjAward' + index)[0];
       if (ele) {
         let newValue = ele.value
         console.log(newValue);
@@ -183,26 +183,26 @@ var app = new Vue({
       let ele = document.getElementsByName('cjGap')[0];
       console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        firebase.database().ref().child('ChoujiangGap').set(newValue);
-      }
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          firebase.database().ref().child('ChoujiangGap').set(newValue);
+        }
       }
     },
     updateCjBanner: function() {
       let ele = document.getElementsByName('cjBanner')[0];
       console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        firebase.database().ref().child('choujiangBanner').set(newValue);
-      }
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          firebase.database().ref().child('choujiangBanner').set(newValue);
+        }
       }
     },
     updateBanner: function(index) {
-      let ele = document.getElementsByName('banner'+index)[0];
+      let ele = document.getElementsByName('banner' + index)[0];
       console.log(ele);
       if (ele) {
         let newValue = ele.value
@@ -213,25 +213,25 @@ var app = new Vue({
       }
     },
     updateNormal: function(index) {
-      let ele = document.getElementsByName('normal'+index)[0];
+      let ele = document.getElementsByName('normal' + index)[0];
       console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        normalRef.child(index).set(newValue);
-      }
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          normalRef.child(index).set(newValue);
+        }
       }
     },
     updateVip: function(index) {
-      let ele = document.getElementsByName('vip'+index)[0];
+      let ele = document.getElementsByName('vip' + index)[0];
       console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        vipRef.child(index).set(newValue);
-      }
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          vipRef.child(index).set(newValue);
+        }
       }
     },
     newNormal: function() {
@@ -274,14 +274,14 @@ var app = new Vue({
       }
     },
     updateNews: function(index) {
-      let ele = document.getElementsByName('news'+index)[0];
+      let ele = document.getElementsByName('news' + index)[0];
       console.log(ele);
       if (ele) {
-      let newValue = ele.value
-      console.log(newValue);
-      if (newValue) {
-        newsRef.child(index).child('content').set(newValue);
-      }
+        let newValue = ele.value
+        console.log(newValue);
+        if (newValue) {
+          newsRef.child(index).child('content').set(newValue);
+        }
       }
     },
     deleteNews: function(index) {
@@ -292,9 +292,10 @@ var app = new Vue({
       let ele2 = document.getElementsByName('eventTitle')[0];
       let ele3 = document.getElementsByName('eventContent')[0];
       if (ele1 && ele2 && ele3) {
-        eventRef.child(this.news.length).child('url').set(ele1.value);
-        eventRef.child(this.news.length).child('title').set(ele2.value);
-        eventRef.child(this.news.length).child('content').set(ele3.value);
+        let curLength = this.events.length;
+        eventRef.child(curLength).child('url').set(ele1.value);
+        eventRef.child(curLength).child('title').set(ele2.value);
+        eventRef.child(curLength).child('content').set(ele3.value);
       }
     },
     updateEvent: function(index) {
@@ -316,6 +317,15 @@ var app = new Vue({
         let newValue = ele.value;
         if (newValue) {
           firebase.database().ref().child('kefu').set(newValue);
+        }
+      }
+    },
+    updateGonggao: function() {
+      let ele = document.getElementsByName('gonggao')[0];
+      if (ele) {
+        let newValue = ele.value;
+        if (newValue) {
+          firebase.database().ref().child('homepagemessage').set(newValue);
         }
       }
     },
