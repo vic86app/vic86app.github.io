@@ -299,9 +299,9 @@ var app = new Vue({
       }
     },
     updateEvent: function(index) {
-      let ele1 = document.getElementsByName('eventURL')[0];
-      let ele2 = document.getElementsByName('eventTitle')[0];
-      let ele3 = document.getElementsByName('eventContent')[0];
+      let ele1 = document.getElementsByName('eventURL' + index)[0];
+      let ele2 = document.getElementsByName('eventTitle' + index)[0];
+      let ele3 = document.getElementsByName('eventContent' + index)[0];
       if (ele1 && ele2 && ele3) {
         eventRef.child(index).child('url').set(ele1.value);
         eventRef.child(index).child('title').set(ele2.value);
