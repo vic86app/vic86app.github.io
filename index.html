@@ -409,13 +409,13 @@
                                 <tr v-for="(item, index) in events">
                                     <th scope="row">{{ index+1 }}</th>
                                     <td>
-                                        <input type="text" style="width: 100%;" :name="'event'+index" :value="item.url" @change="updateEvent(index)">
+                                        <input type="text" style="width: 100%;" :name="'eventURL'+index" :value="item.url" @change="updateEvent(index)">
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 100%;" :name="'event'+index" :value="item.title" @change="updateEvent(index)">
+                                        <input type="text" style="width: 100%;" :name="'eventTitle'+index" :value="item.title" @change="updateEvent(index)">
                                     </td>
                                     <td>
-                                        <input type="text" style="width: 100%;" :name="'event'+index" :value="item.content" @change="updateEvent(index)">
+                                        <input type="text" style="width: 100%;" :name="'eventContent'+index" :value="item.content" @change="updateEvent(index)">
                                     </td>
                                     <td><a class="btn btn-danger btn-xs" v-if="index == (events.length-1)" @click="deleteEvent(index)">删除</a></td>
                                 </tr>
