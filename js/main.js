@@ -27,18 +27,24 @@ var app = new Vue({
   // element to mount to
   el: '#app',
   // initial data
-  data: {
-    currentPage: "Login",
-    user: null,
-    newUser: {
-      name: '',
-      email: '',
-      password: ''
-    },
-    item: null,
-    detail: null,
-    userSearch: '',
-    awardSearch: ''
+  data () {
+    return {
+      currentPage: "Login",
+      user: null,
+      newUser: {
+        name: '',
+        email: '',
+        password: ''
+      },
+      item: null,
+      detail: null,
+      userSearch: '',
+      awardSearch: '',
+      multiDeleting: false,
+      itemsToDelete: [],
+      fromAward: 0,
+      toAward: 0
+    }
   },
   // firebase binding
   // https://github.com/vuejs/vuefire
@@ -70,12 +76,15 @@ var app = new Vue({
       })
     },
     visibleAwards: function() {
+      const awards = this.awards.filter(award => {
+        return !award.hidden
+      })
       if (this.awardSearch === '') {
-        return this.awards;
+        return awards;
       }
       let list = [];
-      for (let i = 0; i < this.awards.length; i++) {
-        let item = this.awards[i];
+      for (let i = 0; i < awards.length; i++) {
+        let item = awards[i];
         if (item.username.indexOf(this.awardSearch) !== -1) {
           list.push(item);
         }
@@ -149,6 +158,24 @@ var app = new Vue({
     },
     deleteAward: function(key) {
       awardsRef.child(key).child('hidden').set(true);
+    },
+    deleteAwardMulti: function() {
+      let updates = {}
+      this.itemsToDelete.forEach(item => {
+        updates[`${item}/hidden`] = true
+      })
+      awardsRef.update(updates)
+    },
+    deleteAwardRange: function() {
+      const f = parseInt(this.fromAward)
+      const t = parseInt(this.toAward)
+      if (f === NaN || t === NaN) { return }
+      if (f < 1 || t > this.visibleAwards.length || t < f) { return }
+      let updates = {}
+      for (let i = f; i <= t; i++ ) {
+        updates[`${this.visibleAwards[i-1]['.key']}/hidden`] = true
+      }
+      awardsRef.update(updates)
     },
     processAward: function(key) {
       awardsRef.child(key).child('processed').set(true);

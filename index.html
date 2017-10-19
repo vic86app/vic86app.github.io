@@ -180,9 +180,26 @@
 										<button class="btn btn-default" type="button">搜索</button>
 									</span>
                         </div>
+                        <div style="margin: 10px 0;">
+                            1. 批量删除：
+                            <a class="btn btn-primary btn-xs" @click="multiDeleting = !multiDeleting">
+                                {{multiDeleting ? '关闭批量删除' : '启用批量删除'}}
+                            </a>
+                            <a class="btn btn-danger btn-xs" @click="deleteAwardMulti" v-if="multiDeleting" :disabled="itemsToDelete.length === 0">批量删除</a>
+                        </div>
+                        <div style="margin: 10px 0;">
+                            2. 区间删除：
+                            <input type="number" v-model="fromAward" style="width: 30px;">
+                            -
+                            <input type="number" v-model="toAward" style="width: 30px;">
+                            <a class="btn btn-danger btn-xs" 
+                                @click="deleteAwardRange"
+                                :disabled="fromAward < 1 || toAward > visibleAwards.length || toAward < fromAward">删除区间</a>
+                        </div>
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th v-if="multiDeleting"></th>
                                     <th>#</th>
                                     <th>用户名</th>
                                     <th>抽奖时间</th>
@@ -192,6 +209,9 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in visibleAwards">
+                                    <td v-if="multiDeleting">
+                                        <input type="checkbox" :value="item['.key']" v-model="itemsToDelete">
+                                    </td>
                                     <th scope="row">{{ index+1 }}</th>
                                     <td>{{ item.username }}</td>
                                     <td>{{ item.date }}</td>
